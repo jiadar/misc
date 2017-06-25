@@ -1,0 +1,5 @@
+source /etc/bashrc
+source /Users/ross/.bash_profile
+export PS1='aorta \w\$ '
+PATH=$PATH:/Library/PostgreSQL/9.6/bin
+

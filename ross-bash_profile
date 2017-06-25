@@ -1,0 +1,51 @@
+if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
+source /etc/bashrc
+source ~/.git-completion.bash
+source ~/.git-prompt.sh
+c_reset='\[\e[0m\]'
+c_path='\[\e[0;31m\]'
+c_git_clean='\[\e[0;32m\]'
+c_git_dirty='\[\e[0;31m\]'
+git_prompt ()
+{
+  # Is this a git directory?
+  if ! git rev-parse --git-dir > /dev/null 2>&1; then
+    return 0
+  fi
+  # Grab working branch name
+  git_branch=$(git branch 2>/dev/null| sed -n '/^\*/s/^\* //p')
+  git_root=`basename $(git rev-parse --show-toplevel)`
+  # Clean or dirty branch
+  if git diff --quiet 2>/dev/null >&2; then
+    git_color="${c_git_clean}"
+  else
+    git_color=${c_git_dirty}
+  fi
+  echo "$git_root.$git_branch"
+}
+export PS1='\[\e[0;32m\]$(git_prompt)\[\033[0m\] \[\033[0;31m\]\W \[\e[0m\]$ '
+export LSCOLORS=ExGxFxdxCxDxDxaccxaeex
+alias ls='ls -Gh'
+export GREP_OPTIONS='--color=always'
+PATH=$PATH:/Library/PostgreSQL/9.6/bin
+function g() {
+    git status
+    git add .
+    git commit -a -m "$1"
+    git push
+    git status
+}
+
+export PGPASSWORD=dropinnow
+function p() {
+    SQL="$*;"
+    /Library/PostgreSQL/9.6/bin/psql --username dropin app_development -c "$SQL"
+}
+export EDITOR=ed
+function ts() {
+	tmate show-messages | grep "ssh session"  | tail -1 | awk '{print $9" "$10}'
+}
+
+function cl() {
+find . -name '*' | wc -l
+}
